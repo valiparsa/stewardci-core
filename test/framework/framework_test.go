@@ -3,9 +3,10 @@
 package framework
 
 import (
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"testing"
 	"time"
+
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 
 	api "github.com/SAP/stewardci-core/pkg/apis/steward/v1alpha1"
 	"github.com/SAP/stewardci-core/test/builder"
@@ -45,7 +46,7 @@ func Test_FrameworkTest(t *testing.T) {
 }
 
 // PipelineRunSleepTooLong is a PipelineRunTestBuilder to test if Timeout works correctly
-func PipelineRunSleepTooLong(Namespace string) PipelineRunTest {
+func PipelineRunSleepTooLong(Namespace string, _ *api.CustomJSON) PipelineRunTest {
 	return PipelineRunTest{
 		PipelineRun: builder.PipelineRun("sleeptoolong-", Namespace,
 			builder.PipelineRunSpec(
@@ -60,7 +61,7 @@ func PipelineRunSleepTooLong(Namespace string) PipelineRunTest {
 }
 
 // PipelineRunWrongExpect is a PipelineRunTestBuilder to test Check returning error
-func PipelineRunWrongExpect(Namespace string) PipelineRunTest {
+func PipelineRunWrongExpect(Namespace string, _ *api.CustomJSON) PipelineRunTest {
 	return PipelineRunTest{
 		PipelineRun: builder.PipelineRun("wrongexpect-", Namespace,
 			builder.PipelineRunSpec(
@@ -74,7 +75,7 @@ func PipelineRunWrongExpect(Namespace string) PipelineRunTest {
 }
 
 // PipelineRunWrongName is a PipelineRunTestBuilder to Check failed pipeline runpipeline run creation
-func PipelineRunWrongName(Namespace string) PipelineRunTest {
+func PipelineRunWrongName(Namespace string, _ *api.CustomJSON) PipelineRunTest {
 	return PipelineRunTest{
 		PipelineRun: builder.PipelineRun("wrong_Name", Namespace,
 			builder.PipelineRunSpec(
@@ -88,7 +89,7 @@ func PipelineRunWrongName(Namespace string) PipelineRunTest {
 }
 
 // PipelineRunWithSecretNameConflict is a PipelineRunTestBuilder to test Name conflict with Secrets
-func PipelineRunWithSecretNameConflict(Namespace string) PipelineRunTest {
+func PipelineRunWithSecretNameConflict(Namespace string, _ *api.CustomJSON) PipelineRunTest {
 	return PipelineRunTest{
 		PipelineRun: builder.PipelineRun("with-secret-name-conflict", Namespace,
 			builder.PipelineRunSpec(
