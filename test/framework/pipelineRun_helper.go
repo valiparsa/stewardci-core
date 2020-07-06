@@ -64,7 +64,8 @@ func executePipelineRunTests(ctx context.Context, t *testing.T, testPlans ...Tes
 				}(&waitWG)
 				if testPlan.cleanup {
 					log.Printf("cleanup: Deleting pipelineRun %q", name)
-					f.DeletePipelineRun(runID)
+					pr := GetPipelineRun(ctx)
+					DeletePipelineRun(ctx, pr)
 				}
 			} else {
 				myTestRun := createPipelineRunTest(pipelineTest, myTestRun)
@@ -169,7 +170,7 @@ func createPipelineRunFromString(ctx context.Context, pipelineRunString string, 
 	return
 }
 
-// DeletePipelineRun deletes a Tenant resource from a client
+// DeletePipelineRun deletes pipelinerun from tenant namespace
 func DeletePipelineRun(ctx context.Context, pipelineRun *api.PipelineRun) error {
 	if pipelineRun == nil {
 		return nil
