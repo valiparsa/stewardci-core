@@ -62,6 +62,10 @@ func executePipelineRunTests(ctx context.Context, t *testing.T, testPlans ...Tes
 					myTestRun := createPipelineRunTest(pipelineTest, myTestRun)
 					startWait(t, myTestRun, waitWG)
 				}(&waitWG)
+				if testPlan.cleanup {
+					log.Printf("cleanup: Deleting pipelineRun %q", name)
+					f.DeletePipelineRun(runID)
+				}
 			} else {
 				myTestRun := createPipelineRunTest(pipelineTest, myTestRun)
 				go func(waitWG *sync.WaitGroup) {
