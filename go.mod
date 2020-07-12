@@ -1,4 +1,4 @@
-module github.com/SAP/stewardci-core
+module github.com/valiparsa/stewardci-core
 
 go 1.14
 
@@ -37,6 +37,7 @@ require (
 )
 
 replace (
+	github.com/SAP/stewardci-core => github.com/valiparsa/stewardci-core v0.4.6
 	github.com/tektoncd/pipeline => github.com/tektoncd/pipeline v0.8.0
 	k8s.io/api => k8s.io/api v0.17.6 // kubernetes-1.17.6
 	k8s.io/apimachinery => k8s.io/apimachinery v0.17.6 // kubernetes-1.17.6
