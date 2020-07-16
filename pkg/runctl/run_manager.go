@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"time"
 
 	steward "github.com/SAP/stewardci-core/pkg/apis/steward"
 	"github.com/SAP/stewardci-core/pkg/apis/steward/v1alpha1"
@@ -94,7 +93,10 @@ func (c *runManager) Start(pipelineRun k8s.PipelineRun) error {
 	ctx := &runContext{
 		pipelineRun: pipelineRun,
 	}
-
+	err = c.cleanupPreviousAttempt(ctx)
+	if err != nil {
+		return err
+	}
 	err = c.prepareRunNamespace(ctx)
 	if err != nil {
 		return err
@@ -104,6 +106,15 @@ func (c *runManager) Start(pipelineRun k8s.PipelineRun) error {
 		return err
 	}
 
+	return nil
+}
+
+func (c *runManager) cleanupPreviousAttempt(ctx *runContext) error {
+	runNamespace := ctx.pipelineRun.GetRunNamespace()
+	if runNamespace != "" {
+		ctx.runNamespace = runNamespace
+		return c.cleanup(ctx)
+	}
 	return nil
 }
 
@@ -533,8 +544,7 @@ func (c *runManager) createTektonTaskRun(ctx *runContext) error {
 					tektonStringParam("RUN_NAMESPACE", namespace),
 				},
 			},
-			// use default timeout from tekton
-			// Timeout: toDuration(defaultBuildTimeout),
+			Timeout: c.pipelineRunsConfig.Timeout,
 
 			// Always set a non-empty pod template even if we don't have
 			// values to set. Otherwise the Tekton default pod template
@@ -643,7 +653,17 @@ func (c *runManager) addTektonTaskRunParamsForLoggingElasticsearch(
 func (c *runManager) GetRun(pipelineRun k8s.PipelineRun) (runi.Run, error) {
 	namespace := pipelineRun.GetRunNamespace()
 	run, err := c.factory.TektonV1alpha1().TaskRuns(namespace).Get(tektonTaskRunName, metav1.GetOptions{})
-	return NewRun(run), err
+	if err != nil {
+		return nil, NewRecoverabilityInfoError(err,
+			k8serrors.IsServerTimeout(err) ||
+				k8serrors.IsServiceUnavailable(err) ||
+				k8serrors.IsTimeout(err) ||
+				k8serrors.IsTooManyRequests(err) ||
+				k8serrors.IsInternalError(err) ||
+				k8serrors.IsUnexpectedServerError(err))
+	}
+	return NewRun(run), nil
+
 }
 
 // Cleanup a run based on a pipelineRun
@@ -680,17 +700,6 @@ func toJSONString(value interface{}) (string, error) {
 		return "", errors.Wrapf(err, "error while serializing to JSON: %v", err)
 	}
 	return string(bytes), nil
-}
-
-// toDuration converts a duration string (see time.ParseDuration) into
-// a "k8s.io/apimachinery/pkg/apis/meta/v1".Duration object.
-// Panics in case of errors.
-func toDuration(duration string) *metav1.Duration {
-	d, err := time.ParseDuration(duration)
-	if err != nil {
-		panic(err)
-	}
-	return &metav1.Duration{Duration: d}
 }
 
 func tektonStringParam(name string, value string) tekton.Param {

@@ -8,7 +8,7 @@ targetNamespace:
 runController:
   image:
     repository: stewardci/stewardci-run-controller
-    tag: "0.4.2" #Do not modify this line! RunController tag updated automatically
+    tag: "0.4.4" #Do not modify this line! RunController tag updated automatically
     pullPolicy: IfNotPresent
   resources:
     limits:
@@ -33,7 +33,7 @@ runController:
 tenantController:
   image:
     repository: stewardci/stewardci-tenant-controller
-    tag: "0.4.2" #Do not modify this line! TenantController tag updated automatically
+    tag: "0.4.4" #Do not modify this line! TenantController tag updated automatically
     pullPolicy: IfNotPresent
   resources:
     limits:
@@ -76,7 +76,7 @@ pipelineRuns:
   jenkinsfileRunner:
     image:
       repository: stewardci/stewardci-jenkinsfile-runner
-      tag: "200624_477b249"
+      tag: "200715_17810ab"
       pullPolicy: IfNotPresent
     resources:
       limits:
@@ -91,6 +91,7 @@ pipelineRuns:
       runAsGroup: 1000
       fsGroup: 1000
     terminationMessagePath: "/run/termination-log"
+  timeout: "60m"
   networkPolicy: ""
   limitRange: ""
   resourceQuota: ""
