@@ -1,4 +1,4 @@
-module github.com/valiparsa/stewardci-core
+module github.com/SAP/stewardci-core
 
 go 1.14
 
